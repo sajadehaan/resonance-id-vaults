@@ -1,840 +1,1517 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brand OS — Jorn</title>
+<title>Resonance.OS — Jorn Bakker · S4J4</title>
+<meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;900&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --night: #1C2B1E;
-  --moss: #2D4A31;
-  --mist: #8FA68E;
-  --ivory: #F2EDE4;
-  --amber: #C4935A;
-  --amber-light: #E8B87A;
-  --border: rgba(143,166,142,0.2);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --c1: #0F0F0E;
+    --c2: #1C1B18;
+    --c3: #2A2822;
+    --c4: #F0EDE6;
+    --c5: #C8A96E;
+    --font-heading: 'Epilogue', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+    --bg: var(--c1);
+    --surface: color-mix(in srgb, var(--c1) 85%, var(--c2) 15%);
+    --surface-2: color-mix(in srgb, var(--c1) 70%, var(--c2) 30%);
+    --border: color-mix(in srgb, var(--c4) 20%, transparent);
+    --text-primary: var(--c4);
+    --text-muted: color-mix(in srgb, var(--c4) 55%, transparent);
+    --text-accent: var(--c5);
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
 
-body {
-  background: var(--night);
-  color: var(--ivory);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  min-height: 100vh;
-  line-height: 1.7;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── HEADER ───────────────────────────────── */
-.header {
-  padding: 60px 48px 48px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-.header::before {
-  content: '';
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(196,147,90,0.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-.header-meta {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--amber);
-  margin-bottom: 16px;
-}
-.header-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(42px, 6vw, 72px);
-  font-weight: 300;
-  letter-spacing: -0.02em;
-  line-height: 1;
-  color: var(--ivory);
-  margin-bottom: 8px;
-}
-.header-sub {
-  font-size: 14px;
-  color: var(--mist);
-  font-weight: 300;
-}
+  html { scroll-behavior: smooth; }
 
-/* ── NAV ──────────────────────────────────── */
-.nav {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.nav::-webkit-scrollbar { display: none; }
-.nav-item {
-  padding: 14px 24px;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--mist);
-  cursor: pointer;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-}
-.nav-item:hover { color: var(--ivory); }
-.nav-item.active {
-  color: var(--amber);
-  border-bottom-color: var(--amber);
-}
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.7;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
 
-/* ── MAIN ─────────────────────────────────── */
-.main {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 48px;
-}
+  /* ── PASSWORD SCREEN ── */
+  #lock-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem;
+    transition: opacity 0.5s ease;
+  }
 
-.module { display: none; }
-.module.active { display: block; animation: fadeIn 0.3s ease; }
+  #lock-screen.unlocking {
+    opacity: 0; pointer-events: none;
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+  .lock-logo {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 3rem;
+  }
 
-/* ── TYPOGRAPHY ───────────────────────────── */
-.section-label {
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--amber);
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.section-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
+  .lock-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
 
-h2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 300;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--ivory);
-  margin-bottom: 24px;
-}
+  .lock-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
 
-.body-text {
-  font-size: 16px;
-  color: var(--mist);
-  line-height: 1.8;
-  font-weight: 300;
-}
+  .pin-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
 
-cite {
-  font-style: italic;
-  color: var(--amber-light);
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.05em;
-}
+  .pin-digit {
+    width: 48px; height: 58px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+    caret-color: var(--text-accent);
+  }
 
-/* ── CARDS ────────────────────────────────── */
-.card {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 28px 32px;
-  margin-bottom: 16px;
-  background: rgba(45, 74, 49, 0.15);
-  transition: border-color 0.2s;
-}
-.card:hover { border-color: rgba(196,147,90,0.3); }
-.card-label {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--amber);
-  margin-bottom: 12px;
-}
-.card-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--ivory);
-  margin-bottom: 10px;
-}
-.card-body {
-  font-size: 14px;
-  color: var(--mist);
-  line-height: 1.75;
-}
+  .pin-digit:focus {
+    border-color: var(--text-accent);
+  }
 
-/* ── GOLDEN CIRCLE ────────────────────────── */
-.golden-circle {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2px;
-  margin: 32px 0;
-}
-.gc-item {
-  padding: 24px 32px;
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  background: rgba(45, 74, 49, 0.2);
-  border-left: 2px solid transparent;
-  transition: all 0.2s;
-}
-.gc-item:hover { border-left-color: var(--amber); background: rgba(45,74,49,0.35); }
-.gc-label {
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--amber);
-  min-width: 48px;
-  padding-top: 2px;
-}
-.gc-text {
-  font-size: 15px;
-  color: var(--ivory);
-  line-height: 1.7;
-}
+  .pin-error {
+    color: #e05252;
+    font-size: 13px;
+    text-align: center;
+    height: 20px;
+    transition: opacity 0.2s;
+  }
 
-/* ── FILTER ───────────────────────────────── */
-.filter-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin: 32px 0;
-}
-@media (max-width: 600px) { .filter-grid { grid-template-columns: 1fr; } }
-.filter-card {
-  padding: 28px;
-  border-radius: 4px;
-}
-.filter-well { background: rgba(45,74,49,0.25); border: 1px solid rgba(143,166,142,0.25); }
-.filter-not { background: rgba(80,40,40,0.2); border: 1px solid rgba(180,100,100,0.2); }
-.filter-label {
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-bottom: 14px;
-}
-.filter-well .filter-label { color: #7DC47F; }
-.filter-not .filter-label { color: #C47D7D; }
+  .lock-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2rem;
+  }
 
-/* ── COLOR PALETTE ────────────────────────── */
-.palette {
-  display: flex;
-  gap: 12px;
-  margin: 32px 0;
-  flex-wrap: wrap;
-}
-.swatch {
-  flex: 1;
-  min-width: 100px;
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.swatch:hover { transform: translateY(-4px); }
-.swatch-color {
-  height: 80px;
-  position: relative;
-}
-.swatch-info {
-  padding: 12px;
-  background: rgba(255,255,255,0.04);
-}
-.swatch-name {
-  font-size: 12px;
-  color: var(--ivory);
-  font-weight: 500;
-  display: block;
-  margin-bottom: 2px;
-}
-.swatch-hex {
-  font-size: 11px;
-  color: var(--mist);
-  font-family: monospace;
-  display: block;
-  margin-bottom: 2px;
-}
-.swatch-role {
-  font-size: 10px;
-  color: var(--mist);
-  display: block;
-  opacity: 0.7;
-}
+  /* ── VAULT (MAIN CONTENT) ── */
+  #vault {
+    display: none;
+    min-height: 100vh;
+  }
 
-/* ── TYPOGRAPHY DISPLAY ───────────────────── */
-.font-display {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin: 32px 0;
-}
-@media (max-width: 600px) { .font-display { grid-template-columns: 1fr; } }
-.font-card {
-  padding: 28px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-}
-.font-sample-display {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 32px;
-  font-weight: 300;
-  color: var(--ivory);
-  margin-bottom: 12px;
-  line-height: 1.2;
-}
-.font-sample-body {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 18px;
-  font-weight: 300;
-  color: var(--mist);
-  margin-bottom: 12px;
-}
-.font-meta {
-  font-size: 11px;
-  color: var(--amber);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+  #vault.visible { display: block; }
 
-/* ── SFEER TAGS ───────────────────────────── */
-.sfeer-grid { display: flex; gap: 16px; margin: 24px 0; flex-wrap: wrap; }
-.sfeer-tag {
-  padding: 8px 16px;
-  border-radius: 2px;
-  font-size: 13px;
-  letter-spacing: 0.04em;
-}
-.sfeer-do { background: rgba(45,74,49,0.4); color: #7DC47F; border: 1px solid rgba(125,196,127,0.25); }
-.sfeer-dont { background: rgba(80,40,40,0.3); color: #C47D7D; border: 1px solid rgba(196,125,125,0.25); text-decoration: line-through; opacity: 0.7; }
+  /* ── STICKY HEADER ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 97%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
 
-/* ── TOON RULES ───────────────────────────── */
-.toon-card {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-.toon-rule {
-  padding: 16px 24px;
-  background: rgba(45,74,49,0.2);
-  font-size: 13px;
-  color: var(--amber);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  border-bottom: 1px solid var(--border);
-}
-.toon-examples {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-@media (max-width: 600px) { .toon-examples { grid-template-columns: 1fr; } }
-.toon-ex {
-  padding: 16px 24px;
-  font-size: 13px;
-  line-height: 1.6;
-}
-.toon-ex-wel { color: var(--mist); border-right: 1px solid var(--border); }
-.toon-ex-niet { color: var(--mist); opacity: 0.5; }
-.toon-ex-label {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.toon-ex-wel .toon-ex-label { color: #7DC47F; }
-.toon-ex-niet .toon-ex-label { color: #C47D7D; }
+  .topbar {
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    border-bottom: 1px solid var(--border);
+  }
 
-/* ── BLUEPRINT ────────────────────────────── */
-.blueprint-section {
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 12px;
-}
-.bp-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  background: rgba(45,74,49,0.2);
-  cursor: pointer;
-  border-bottom: 1px solid transparent;
-  transition: background 0.2s;
-}
-.bp-head:hover { background: rgba(45,74,49,0.35); }
-.bp-head.open { border-bottom-color: var(--border); }
-.bp-name { font-size: 13px; font-weight: 500; color: var(--ivory); }
-.bp-doel { font-size: 12px; color: var(--mist); }
-.bp-toggle { color: var(--amber); font-size: 18px; transition: transform 0.2s; }
-.bp-head.open .bp-toggle { transform: rotate(180deg); }
-.bp-body {
-  padding: 24px;
-  display: none;
-}
-.bp-body.open { display: block; }
-.bp-field { margin-bottom: 16px; }
-.bp-field:last-child { margin-bottom: 0; }
-.bp-field-label {
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--amber);
-  margin-bottom: 6px;
-}
-.bp-field-value {
-  font-size: 14px;
-  color: var(--ivory);
-  line-height: 1.6;
-}
-.bp-field-value.headline {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 24px;
-  font-weight: 300;
-}
-.bp-cta {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 8px 20px;
-  background: transparent;
-  border: 1px solid var(--amber);
-  color: var(--amber);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 2px;
-}
+  .topbar-brand {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
 
-/* ── TAGLINES ─────────────────────────────── */
-.tagline-grid { margin: 32px 0; }
-.tagline-item {
-  padding: 20px 28px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-}
-.tagline-item:hover { border-color: rgba(196,147,90,0.4); background: rgba(45,74,49,0.15); }
-.tagline-item.recommended { border-color: var(--amber); background: rgba(196,147,90,0.07); }
-.tagline-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 300;
-  color: var(--ivory);
-  flex: 1;
-  line-height: 1.3;
-}
-.tagline-why {
-  font-size: 12px;
-  color: var(--mist);
-  margin-top: 6px;
-  line-height: 1.5;
-}
-.tagline-badge {
-  font-size: 10px;
-  padding: 3px 8px;
-  background: var(--amber);
-  color: var(--night);
-  border-radius: 2px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-weight: 500;
-  flex-shrink: 0;
-  margin-top: 4px;
-}
+  .topbar-name {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    color: var(--text-accent);
+  }
 
-/* ── GAP ──────────────────────────────────── */
-.gap-card {
-  border: 1px solid rgba(196,147,90,0.4);
-  border-radius: 4px;
-  padding: 36px;
-  text-align: center;
-  background: rgba(196,147,90,0.05);
-  margin-top: 40px;
-}
-.gap-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px;
-  font-weight: 300;
-  color: var(--ivory);
-  margin-bottom: 16px;
-}
-.gap-text {
-  font-size: 14px;
-  color: var(--mist);
-  max-width: 480px;
-  margin: 0 auto 28px;
-  line-height: 1.8;
-}
-.gap-btn {
-  display: inline-block;
-  padding: 14px 32px;
-  background: var(--amber);
-  color: var(--night);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 500;
-  border-radius: 2px;
-  cursor: pointer;
-  text-decoration: none;
-}
-.gap-btn:hover { background: var(--amber-light); }
+  /* ── HERO ── */
+  .hero {
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
 
-/* ── FOOTER ───────────────────────────────── */
-.footer {
-  padding: 32px 48px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.footer-brand {
-  font-size: 12px;
-  color: var(--mist);
-  letter-spacing: 0.08em;
-}
-.footer-brand span { color: var(--amber); }
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, color-mix(in srgb, var(--c5) 12%, transparent) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fade-up 0.8s 0.2s forwards;
+  }
+
+  .hero-name {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 1.25rem;
+    opacity: 0;
+    animation: fade-up 0.8s 0.4s forwards;
+  }
+
+  .hero-tagline {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 400;
+    font-style: normal;
+    color: var(--text-primary);
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.15;
+    opacity: 0;
+    animation: fade-up 0.8s 0.6s forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0;
+    animation: fade-up 0.8s 0.8s forwards;
+  }
+
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .hero-meta span::before { content: '·'; color: var(--text-accent); }
+
+  /* ── NAV ── */
+  .module-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    padding: 0 50%;
+    position: relative;
+  }
+
+  .module-nav::-webkit-scrollbar { display: none; }
+
+  .nav-item {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 13px 1.1rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    text-decoration: none;
+    display: block;
+    flex-shrink: 0;
+    opacity: 0.4;
+    transform: scale(0.92);
+    transition: opacity 0.35s ease, transform 0.35s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .nav-item:hover {
+    opacity: 0.7;
+    color: var(--text-primary);
+  }
+
+  .nav-item.active {
+    opacity: 1;
+    transform: scale(1);
+    color: var(--text-primary);
+    border-bottom-color: var(--text-accent);
+  }
+
+  /* ── MODULES ── */
+  .modules-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  .module-section {
+    margin-bottom: 5rem;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    scroll-margin-top: 100px;
+  }
+
+  .module-section.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .module-label {
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .module-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 80px;
+  }
+
+  .module-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+  }
+
+  /* ── MODULE 1 ── */
+  .mirror-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text-primary);
+    position: relative;
+  }
+
+  .mirror-block::before {
+    content: '"';
+    font-family: var(--font-heading);
+    font-size: 6rem;
+    line-height: 0;
+    color: var(--text-accent);
+    opacity: 0.3;
+    position: absolute;
+    top: 2.5rem;
+    left: 2rem;
+  }
+
+  .mirror-block p { padding-left: 1rem; }
+
+  .mirror-block .citaat {
+    color: var(--text-accent);
+    font-style: italic;
+  }
+
+  /* ── MODULE 2 ── */
+  .golden-circle {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .gc-item {
+    background: var(--surface);
+    padding: 2rem 1.5rem;
+    position: relative;
+  }
+
+  .gc-item:hover { background: var(--surface-2); }
+
+  .gc-num {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .gc-heading {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+
+  .gc-text {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* ── MODULE 3 ── */
+  .filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .filter-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+
+  .filter-card.yes { border-left: 3px solid var(--c5); }
+  .filter-card.no { border-left: 3px solid color-mix(in srgb, var(--text-muted) 40%, transparent); }
+
+  .filter-card-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .filter-card.yes .filter-card-label { color: var(--text-accent); }
+  .filter-card.no .filter-card-label { color: var(--text-muted); }
+
+  .filter-card p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* ── MODULE 4 ── */
+  .brand-book-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .bb-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+
+  .bb-card-title {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 1.25rem;
+  }
+
+  .color-swatches {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .swatch {
+    width: 44px; height: 44px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    cursor: default;
+    flex-shrink: 0;
+    transition: transform 0.15s;
+  }
+
+  .swatch:hover { transform: scale(1.1); }
+
+  .swatch-info {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .swatch-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .swatch-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .swatch-name { color: var(--text-primary); }
+  .swatch-hex { color: var(--text-muted); font-size: 11px; }
+  .swatch-rol { 
+    margin-left: auto;
+    color: var(--text-accent);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .font-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .font-demo {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+
+  .font-demo-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .font-demo-name {
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .font-demo-sample-heading {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-top: 4px;
+  }
+
+  .font-demo-sample-body {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+
+  .sfeer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .sfeer-group-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+
+  .sfeer-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sfeer-tag {
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  .sfeer-tag.do {
+    background: color-mix(in srgb, var(--c5) 15%, transparent);
+    color: var(--text-accent);
+    border: 1px solid color-mix(in srgb, var(--c5) 30%, transparent);
+  }
+
+  .sfeer-tag.dont {
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  /* ── MODULE 5 ── */
+  .tone-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .tone-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .tone-rule {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .tone-rule-num {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--text-accent);
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .tone-examples {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tone-ex {
+    padding: 1rem 1.5rem;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .tone-ex:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .tone-ex-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .tone-ex.wel .tone-ex-label { color: var(--text-accent); }
+  .tone-ex.niet .tone-ex-label { color: var(--text-muted); }
+  .tone-ex.wel p { color: var(--text-primary); }
+  .tone-ex.niet p { color: var(--text-muted); text-decoration: line-through; opacity: 0.6; }
+
+  /* ── MODULE 6 ── */
+  .blueprint-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .blueprint-intro-item {
+    flex: 1;
+  }
+
+  .bpi-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 6px;
+  }
+
+  .bpi-value {
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .wireframe-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .wf-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--text-accent);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.75rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .wf-block:hover { background: var(--surface-2); }
+
+  .wf-block-above-fold { min-height: 110px; }
+  .wf-block-mid        { min-height: 80px; }
+  .wf-block-footer     { min-height: 56px; }
+
+  .wf-block-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .wf-block-meta { flex: 1; }
+
+  .wf-pos {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 6px;
+  }
+
+  .wf-name {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .wf-headline {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .wf-cta-chip {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 12px;
+    background: color-mix(in srgb, var(--c5) 18%, transparent);
+    color: var(--text-accent);
+    border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--c5) 30%, transparent);
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-end;
+  }
+
+  .wf-detail {
+    display: none;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .wf-block.open .wf-detail { display: block; }
+
+  .wf-detail strong { color: var(--text-primary); font-weight: 500; }
+
+  .wf-expand-hint {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.5;
+    position: absolute;
+    bottom: 10px;
+    right: 1.25rem;
+  }
+
+  .wf-block.open .wf-expand-hint { display: none; }
+
+  /* ── MODULE 7 ── */
+  .tagline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .tagline-item {
+    background: var(--surface);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    transition: background 0.15s;
+  }
+
+  .tagline-item:hover { background: var(--surface-2); }
+
+  .tagline-item.aanbevolen {
+    background: color-mix(in srgb, var(--c5) 8%, var(--surface));
+    border-left: 3px solid var(--text-accent);
+  }
+
+  .tagline-num {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    padding-top: 3px;
+    flex-shrink: 0;
+    min-width: 32px;
+  }
+
+  .tagline-body { flex: 1; }
+
+  .tagline-text {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .tagline-why {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .tagline-badge {
+    font-size: 10px;
+    padding: 3px 10px;
+    background: color-mix(in srgb, var(--c5) 15%, transparent);
+    color: var(--text-accent);
+    border-radius: 20px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    align-self: flex-start;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .aanbeveling-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+
+  .aanbeveling-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .aanbeveling-text {
+    font-size: 15px;
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  /* ── NEXT STEP ── */
+  .next-step-section {
+    border-top: 1px solid var(--border);
+    padding-top: 3rem;
+  }
+
+  .next-step-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .next-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+  }
+
+  .next-card.build {
+    border-color: var(--text-accent);
+    background: color-mix(in srgb, var(--c5) 5%, var(--surface));
+  }
+
+  .next-card-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-accent);
+    margin-bottom: 1rem;
+  }
+
+  .next-card-body {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 0;
+  }
+
+  .next-card.build .next-card-body {
+    margin-bottom: 1.5rem;
+  }
+
+  .next-card-cta {
+    display: inline-block;
+    font-size: 13px;
+    padding: 8px 20px;
+    background: var(--text-accent);
+    color: var(--bg);
+    border-radius: 30px;
+    text-decoration: none;
+    font-family: var(--font-heading);
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+
+  .next-card-cta:hover { opacity: 0.85; }
+
+  /* ── FOOTER ── */
+  .vault-footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .vault-footer span { color: var(--text-accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .topbar { padding: 0 1rem; height: 42px; }
+    .topbar-brand { font-size: 10px; letter-spacing: 0.12em; }
+    .hero { padding: 3rem 1.25rem; min-height: 80vh; }
+    .hero-tagline { font-size: clamp(1.6rem, 8vw, 2.4rem); }
+    .hero-meta { flex-direction: column; gap: 0.5rem; align-items: center; }
+    .module-nav { padding: 0 45vw; }
+    .nav-item { padding: 11px 0.9rem; font-size: 11px; }
+    .modules-wrapper { padding: 2.5rem 1.25rem 4rem; }
+    .module-section { margin-bottom: 3.5rem; }
+    .golden-circle { grid-template-columns: 1fr; }
+    .filter-grid { grid-template-columns: 1fr; }
+    .brand-book-grid { grid-template-columns: 1fr; }
+    .tone-examples { grid-template-columns: 1fr; }
+    .tone-ex:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .blueprint-intro { flex-direction: column; gap: 1rem; }
+    .wf-block { padding: 1.25rem 1.25rem; }
+    .wf-block-top { flex-direction: column; gap: 0.5rem; }
+    .wf-cta-chip { align-self: flex-start; }
+    .wf-block-above-fold { min-height: auto; }
+    .wf-block-mid { min-height: auto; }
+    .wf-block-footer { min-height: auto; }
+    .next-step-grid { grid-template-columns: 1fr; }
+    .pin-container { gap: 6px; }
+    .pin-digit { width: 40px; height: 50px; font-size: 1.25rem; }
+    .lock-title { font-size: clamp(1.4rem, 6vw, 2rem); }
+  }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <p class="header-meta">S4J4 · Signal Architecture · Brand OS</p>
-  <h1 class="header-name">Jorn</h1>
-  <p class="header-sub">Run Club Tokyo · Gegenereerd op basis van je Inner Signal Audio</p>
+<!-- LOCK SCREEN -->
+<div id="lock-screen" role="main" aria-label="Secure access">
+  <p class="lock-logo">S4J4 · Signal Architecture</p>
+  <h1 class="lock-title">Jorn Bakker<br>Resonance.OS</h1>
+  <p class="lock-sub">Enter your 6-digit access code</p>
+  <div class="pin-container" id="pin-inputs">
+    <input class="pin-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1">
+    <input class="pin-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+    <input class="pin-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+    <input class="pin-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+    <input class="pin-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+    <input class="pin-digit" type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+  </div>
+  <p class="pin-error" id="pin-error" aria-live="polite">&nbsp;</p>
+  <p class="lock-hint">Code received by email from S4J4</p>
 </div>
 
-<nav class="nav">
-  <div class="nav-item active" onclick="showModule('spiegel', this)">Identiteit</div>
-  <div class="nav-item" onclick="showModule('kern', this)">Resonantie-kern</div>
-  <div class="nav-item" onclick="showModule('filter', this)">Filter</div>
-  <div class="nav-item" onclick="showModule('brandbook', this)">Brand Book</div>
-  <div class="nav-item" onclick="showModule('toon', this)">Toon</div>
-  <div class="nav-item" onclick="showModule('blueprint', this)">Website</div>
-  <div class="nav-item" onclick="showModule('tagline', this)">Taglines</div>
-</nav>
+<!-- VAULT -->
+<div id="vault" aria-label="Resonance.OS">
 
-<main class="main">
-
-  <!-- MODULE 1: IDENTITEITS-SPIEGEL -->
-  <div class="module active" id="mod-spiegel">
-    <div class="section-label">Module 01 — Identiteits-spiegel</div>
-    <h2>Wie jij bent<br>als je niet oplet.</h2>
-    <p class="body-text">
-      Jij bent iemand die midden in een volle wereld een plek heeft gebouwd waar stilte niet afwezig is maar aanwezig. Je startte in Yoyogi Park met zes mensen en nu zijn er veertig — niet omdat je adverteerde, maar omdat <cite>"mensen mensen meenemen."</cite>
-      <br><br>
-      Jij praat nooit over pace. Als iemand dat doet, stel je een andere vraag: hoe voelde het? Dat is niet een trucje, dat is een overtuiging. Je gelooft dat de meeste fitnesscultuur gebroken is omdat ze mensen laat geloven dat hun lichaam een probleem is. Jij doet het tegenovergestelde.
-      <br><br>
-      Elke zondagochtend maak je na de run samen ontbijt in het park — niet als teambuilding, maar omdat dat <cite>"misschien wel het mooiste is wat ik doe."</cite> Je bent niet op zoek naar snelle lopers. Je zoekt mensen die ergens tussen wakker worden en in slaap vallen hebben geleerd dat aanwezig zijn genoeg is.
-    </p>
-  </div>
-
-  <!-- MODULE 2: RESONANTIE-KERN -->
-  <div class="module" id="mod-kern">
-    <div class="section-label">Module 02 — Golden Circle</div>
-    <h2>Waarom je dit doet.<br>Hoe je het doet.<br>Wat je levert.</h2>
-    <div class="golden-circle">
-      <div class="gc-item">
-        <span class="gc-label">Why</span>
-        <p class="gc-text"><cite>"Hardlopen heeft mij letterlijk teruggebracht. Niet als sport, maar als ritueel. Als de enige tijd in de dag waarop ik echt aanwezig was."</cite> Jorn bouwt wat hem gered heeft — niet als therapie, maar als infrastructuur voor anderen die hetzelfde nodig hebben zonder het te weten.</p>
-      </div>
-      <div class="gc-item">
-        <span class="gc-label">How</span>
-        <p class="gc-text">Door nooit te praten over prestatie. Geen PRs, geen pace, geen voor-en-na's. Alleen de vraag: hoe voelde het? Bewegen als iets om mee samen te werken, niet tegen te vechten.</p>
-      </div>
-      <div class="gc-item">
-        <span class="gc-label">What</span>
-        <p class="gc-text">Een wekelijkse bewegingspraktijk in Tokyo — run club, recovery-content, gezamenlijk ontbijt — voor mensen die hun lichaam willen bewonen in plaats van verbeteren.</p>
-      </div>
+  <header class="site-header">
+    <div class="topbar" aria-label="Vault navigation">
+      <span class="topbar-brand">S4J4 · Resonance.OS</span>
+      <span class="topbar-name">Jorn Bakker</span>
     </div>
-  </div>
+    <nav class="module-nav" aria-label="Module navigation">
+      <a href="#m1" class="nav-item">01 · Mirror</a>
+      <a href="#m2" class="nav-item">02 · Core</a>
+      <a href="#m3" class="nav-item">03 · Filter</a>
+      <a href="#m4" class="nav-item">04 · Brand Book</a>
+      <a href="#m5" class="nav-item">05 · Voice</a>
+      <a href="#m6" class="nav-item">06 · Blueprint</a>
+      <a href="#m7" class="nav-item">07 · Taglines</a>
+      <a href="#next" class="nav-item">Next</a>
+    </nav>
+  </header>
 
-  <!-- MODULE 3: FILTER -->
-  <div class="module" id="mod-filter">
-    <div class="section-label">Module 03 — The Filter</div>
-    <h2>Wie je aantrekt.<br>Wie je laat gaan.</h2>
-    <div class="filter-grid">
-      <div class="filter-card filter-well">
-        <p class="filter-label">Wel voor</p>
-        <p class="body-text" style="font-size:14px;">Voor mensen tussen de 28 en 45 die midden in een leven zitten dat goed lijkt van buiten maar innerlijk wringt. Die hardlopen altijd hebben gezien als iets voor anderen — de slanken, de snellen. Die zoeken naar een plek om zichzelf te zijn zonder te presteren. Die een maandag zonder hoofdpijn belangrijker vinden dan een snellere 5K.</p>
-      </div>
-      <div class="filter-card filter-not">
-        <p class="filter-label">Niet voor</p>
-        <p class="body-text" style="font-size:14px;">Niet voor mensen die komen voor een PR. Niet voor degenen die het eerste gesprek beginnen over hun pace of hun vorige club. Niet voor Instagram-atleten op zoek naar content-materiaal. Niet voor mensen die bewegen zien als straf voor eten.</p>
-      </div>
+  <!-- HERO -->
+  <section class="hero" aria-label="Intro">
+    <p class="hero-label">Resonance.OS · May 2026</p>
+    <h1 class="hero-name">Jorn Bakker</h1>
+    <p class="hero-tagline">Show up. That's it. Show up and the rest follows.</p>
+    <div class="hero-meta">
+      <span>Community</span>
+      <span>English</span>
+      <span>7 modules</span>
     </div>
-  </div>
+  </section>
 
-  <!-- MODULE 4: BRAND BOOK -->
-  <div class="module" id="mod-brandbook">
-    <div class="section-label">Module 04 — Brand Book Lite</div>
-    <h2>Kleur. Type. Sfeer.</h2>
+  <!-- MODULES WRAPPER -->
+  <div class="modules-wrapper">
 
-    <div class="palette">
-      <div class="swatch">
-        <div class="swatch-color" style="background:#1C2B1E;"></div>
-        <div class="swatch-info">
-          <span class="swatch-name">Nachtelijk bos</span>
-          <span class="swatch-hex">#1C2B1E</span>
-          <span class="swatch-role">Primair</span>
+    <!-- MODULE 1 -->
+    <section id="m1" class="module-section">
+      <p class="module-label">Module 01</p>
+      <h2 class="module-title">Who you are</h2>
+      <div class="mirror-block">
+        <p>You're someone who builds belonging out of nothing. You landed in a city where you knew no one, and instead of waiting to be included, you went for a run and asked if anyone wanted to join. <span class="citaat">"Two people showed up. That was enough."</span> That's not a small thing — most people never post that message, because two people showing up feels like failure. You understood it as a beginning. What you run isn't a training programme. It's a reason to be somewhere at 6am when the city is still quiet. People come back not because they're chasing a race time but because something about <span class="citaat">"moving through the city while it's still quiet"</span> does something to them that they can't quite explain, and you understand that feeling completely. You document it on film. You soundtrack it carefully. You don't want a sponsor banner. The run is enough — and you mean that in a way most organisers never figure out.</p>
+      </div>
+    </section>
+
+    <!-- MODULE 2 -->
+    <section id="m2" class="module-section">
+      <p class="module-label">Module 02</p>
+      <h2 class="module-title">Why you do what you do</h2>
+      <div class="golden-circle">
+        <div class="gc-item">
+          <p class="gc-num">WHY</p>
+          <h3 class="gc-heading">Why</h3>
+          <p class="gc-text">Because showing up for strangers — and having them show up for you — is something you didn't know you needed until you had it. You build the thing you wished existed when you arrived somewhere alone.</p>
+        </div>
+        <div class="gc-item">
+          <p class="gc-num">HOW</p>
+          <h3 class="gc-heading">How</h3>
+          <p class="gc-text">By refusing to make running a performance. No pace tracking, no sponsors, no bar at the finish. You end wherever the run ends. The aesthetic is deliberate — the routes, the music, the film photography. Everything signals: this is considered, not casual.</p>
+        </div>
+        <div class="gc-item">
+          <p class="gc-num">WHAT</p>
+          <h3 class="gc-heading">What</h3>
+          <p class="gc-text">A run club in Tokyo for people who want to feel part of something without it being a whole thing. Twice a week. Sometimes at 6am. Always worth showing up for.</p>
         </div>
       </div>
-      <div class="swatch">
-        <div class="swatch-color" style="background:#2D4A31;"></div>
-        <div class="swatch-info">
-          <span class="swatch-name">Donker mos</span>
-          <span class="swatch-hex">#2D4A31</span>
-          <span class="swatch-role">Secundair</span>
+    </section>
+
+    <!-- MODULE 3 -->
+    <section id="m3" class="module-section">
+      <p class="module-label">Module 03</p>
+      <h2 class="module-title">Who you attract — and who you don't</h2>
+      <div class="filter-grid">
+        <div class="filter-card yes">
+          <p class="filter-card-label">Who it's for</p>
+          <p>People who moved somewhere new and are still figuring it out, or who've been somewhere for years and realise they never actually built a life there. They're curious, a little lost in a good way, and want to feel part of something without it requiring a full identity shift. They care how things feel — the route, the hour, the vibe — not just what they achieve.</p>
+        </div>
+        <div class="filter-card no">
+          <p class="filter-card-label">Who it's not for</p>
+          <p>People who need a Strava segment to justify the effort. Those looking for a race crew, a networking event, or a post-run sponsored pint. Anyone who measures a run club's value by its gear partnerships or its Garmin data. If you need a sponsor banner to feel legitimate, this isn't your place.</p>
         </div>
       </div>
-      <div class="swatch">
-        <div class="swatch-color" style="background:#8FA68E;"></div>
-        <div class="swatch-info">
-          <span class="swatch-name">Ochtendmist</span>
-          <span class="swatch-hex">#8FA68E</span>
-          <span class="swatch-role">Tertiair</span>
+    </section>
+
+    <!-- MODULE 4 -->
+    <section id="m4" class="module-section">
+      <p class="module-label">Module 04</p>
+      <h2 class="module-title">How you look</h2>
+      <div class="brand-book-grid">
+
+        <!-- Colours -->
+        <div class="bb-card">
+          <p class="bb-card-title">Colour Palette</p>
+          <div class="color-swatches">
+            <div class="swatch" style="background:#0F0F0E" title="Before Dawn"></div>
+            <div class="swatch" style="background:#1C1B18" title="Asphalt"></div>
+            <div class="swatch" style="background:#2A2822" title="City Shadow"></div>
+            <div class="swatch" style="background:#F0EDE6" title="First Light"></div>
+            <div class="swatch" style="background:#C8A96E" title="Warm Grain"></div>
+          </div>
+          <div class="swatch-info">
+            <div class="swatch-row">
+              <div class="swatch-dot" style="background:#0F0F0E"></div>
+              <span class="swatch-name">Before Dawn</span>
+              <span class="swatch-hex">#0F0F0E</span>
+              <span class="swatch-rol">Primary</span>
+            </div>
+            <div class="swatch-row">
+              <div class="swatch-dot" style="background:#1C1B18"></div>
+              <span class="swatch-name">Asphalt</span>
+              <span class="swatch-hex">#1C1B18</span>
+              <span class="swatch-rol">Secondary</span>
+            </div>
+            <div class="swatch-row">
+              <div class="swatch-dot" style="background:#2A2822"></div>
+              <span class="swatch-name">City Shadow</span>
+              <span class="swatch-hex">#2A2822</span>
+              <span class="swatch-rol">Tertiary</span>
+            </div>
+            <div class="swatch-row">
+              <div class="swatch-dot" style="background:#F0EDE6"></div>
+              <span class="swatch-name">First Light</span>
+              <span class="swatch-hex">#F0EDE6</span>
+              <span class="swatch-rol">Light</span>
+            </div>
+            <div class="swatch-row">
+              <div class="swatch-dot" style="background:#C8A96E"></div>
+              <span class="swatch-name">Warm Grain</span>
+              <span class="swatch-hex">#C8A96E</span>
+              <span class="swatch-rol">Accent</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typography -->
+        <div class="bb-card">
+          <p class="bb-card-title">Typography</p>
+          <div class="font-pair">
+            <div class="font-demo">
+              <p class="font-demo-label">Headings · Epilogue</p>
+              <p class="font-demo-sample-heading">Jorn Bakker</p>
+            </div>
+            <div class="font-demo">
+              <p class="font-demo-label">Body · Archivo</p>
+              <p class="font-demo-sample-body">Epilogue's sharp, unconventional geometry mirrors Jorn's refusal to follow the run-club playbook. Archivo brings legibility and warmth — the same clarity he brings to why the run matters.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mood Words -->
+        <div class="bb-card" style="grid-column: 1 / -1;">
+          <p class="bb-card-title">Mood Words</p>
+          <div class="sfeer-grid">
+            <div>
+              <p class="sfeer-group-label">Do</p>
+              <div class="sfeer-tags">
+                <span class="sfeer-tag do">Raw</span>
+                <span class="sfeer-tag do">Intentional</span>
+                <span class="sfeer-tag do">Quiet</span>
+              </div>
+            </div>
+            <div>
+              <p class="sfeer-group-label">Don't</p>
+              <div class="sfeer-tags">
+                <span class="sfeer-tag dont">Performative</span>
+                <span class="sfeer-tag dont">Hustle</span>
+                <span class="sfeer-tag dont">Corporate</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MODULE 5 -->
+    <section id="m5" class="module-section">
+      <p class="module-label">Module 05</p>
+      <h2 class="module-title">How you sound</h2>
+      <div class="tone-cards">
+
+        <div class="tone-card">
+          <div class="tone-rule">
+            <span class="tone-rule-num">Rule 01</span>
+            <span>Say the specific thing, not the impressive thing.</span>
+          </div>
+          <div class="tone-examples">
+            <div class="tone-ex wel">
+              <p class="tone-ex-label">Do</p>
+              <p>We meet Tuesdays at 6am at Yoyogi Park south gate. No registration, just show up.</p>
+            </div>
+            <div class="tone-ex niet">
+              <p class="tone-ex-label">Don't</p>
+              <p>Join our inclusive community movement experience, open to all fitness levels.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tone-card">
+          <div class="tone-rule">
+            <span class="tone-rule-num">Rule 02</span>
+            <span>Let the silence do work. Not every sentence needs to close.</span>
+          </div>
+          <div class="tone-examples">
+            <div class="tone-ex wel">
+              <p class="tone-ex-label">Do</p>
+              <p>Two people showed up the first time. That was enough.</p>
+            </div>
+            <div class="tone-ex niet">
+              <p class="tone-ex-label">Don't</p>
+              <p>What started small has grown into an amazing community that proves anyone can start something great!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tone-card">
+          <div class="tone-rule">
+            <span class="tone-rule-num">Rule 03</span>
+            <span>Write like Four Tet sounds — moving but not rushing.</span>
+          </div>
+          <div class="tone-examples">
+            <div class="tone-ex wel">
+              <p class="tone-ex-label">Do</p>
+              <p>The city looks different at 6am. You'll see it when you come.</p>
+            </div>
+            <div class="tone-ex niet">
+              <p class="tone-ex-label">Don't</p>
+              <p>SIGN UP NOW! Limited spots! Don't miss out on Tokyo's fastest-growing run community!</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MODULE 6 -->
+    <section id="m6" class="module-section">
+      <p class="module-label">Module 06</p>
+      <h2 class="module-title">How your website works</h2>
+
+      <div class="blueprint-intro">
+        <div class="blueprint-intro-item">
+          <p class="bpi-label">Primary goal</p>
+          <p class="bpi-value">Community</p>
+        </div>
+        <div class="blueprint-intro-item" style="flex: 2;">
+          <p class="bpi-label">Conversion logic</p>
+          <p class="bpi-value">A stranger who just landed in Tokyo opens your site, immediately feels like this place gets them, and shows up on Tuesday morning — without needing to be convinced.</p>
         </div>
       </div>
-      <div class="swatch">
-        <div class="swatch-color" style="background:#F2EDE4;"></div>
-        <div class="swatch-info" style="background:rgba(0,0,0,0.3);">
-          <span class="swatch-name">Warm ivoor</span>
-          <span class="swatch-hex">#F2EDE4</span>
-          <span class="swatch-role">Licht</span>
+
+      <div class="wireframe-stack">
+        <!-- Block 1 -->
+        <div class="wf-block wf-block-above-fold" onclick="this.classList.toggle('open')">
+          <div class="wf-block-top">
+            <div class="wf-block-meta">
+              <p class="wf-pos">Section 01 · Above the fold</p>
+              <h3 class="wf-name">Hero</h3>
+              <p class="wf-headline">"Show up. That's it."</p>
+            </div>
+            <span class="wf-cta-chip">Find us on Instagram</span>
+          </div>
+          <div class="wf-detail">
+            <strong>Conversion role:</strong> Immediate recognition. The visitor should feel this in two seconds — not read it, feel it.<br><br>
+            <strong>Subheading:</strong> A run club in Tokyo. No pace. No pressure. Just the city at 6am.<br><br>
+            <strong>Body instruction:</strong> No body copy in the hero. One tagline, one subheading, one CTA. Trust the silence.<br><br>
+            <strong>UX note:</strong> Full-bleed dark background. Film-grain texture or a single hero image from a pre-dawn run. The CTA links to Instagram — that's where the community lives.
+          </div>
+          <span class="wf-expand-hint">↓ expand</span>
+        </div>
+        <!-- Block 2 -->
+        <div class="wf-block wf-block-mid" onclick="this.classList.toggle('open')">
+          <div class="wf-block-top">
+            <div class="wf-block-meta">
+              <p class="wf-pos">Section 02 · Mid page</p>
+              <h3 class="wf-name">The Run</h3>
+              <p class="wf-headline">"What happens when you show up."</p>
+            </div>
+            <span class="wf-cta-chip">See the routes</span>
+          </div>
+          <div class="wf-detail">
+            <strong>Conversion role:</strong> Answer the question: what actually is this? Without making it sound like a product.<br><br>
+            <strong>Subheading:</strong> Twice a week. Sometimes 6am. Always worth it.<br><br>
+            <strong>Body instruction:</strong> Short. Three to four sentences max. Write about the experience, not the logistics. Use specifics — the hour, the route feeling, what happens after.<br><br>
+            <strong>UX note:</strong> Film photography grid alongside the copy. 4 photos minimum. No captions — let the images carry the tone.
+          </div>
+          <span class="wf-expand-hint">↓ expand</span>
+        </div>
+        <!-- Block 3 -->
+        <div class="wf-block wf-block-mid" onclick="this.classList.toggle('open')">
+          <div class="wf-block-top">
+            <div class="wf-block-meta">
+              <p class="wf-pos">Section 03 · Mid page</p>
+              <h3 class="wf-name">Who comes</h3>
+              <p class="wf-headline">"People who are figuring it out."</p>
+            </div>
+            <span class="wf-cta-chip">Join the group chat</span>
+          </div>
+          <div class="wf-detail">
+            <strong>Conversion role:</strong> Make the right person feel seen. Make the wrong person self-select out. Both outcomes are good.<br><br>
+            <strong>Subheading:</strong> New to Tokyo. Been here for years. Curious, a little lost in the best way.<br><br>
+            <strong>Body instruction:</strong> Write about the human, not the runner. Who are they when they're not running? What were they looking for before they found this? Don't list demographics.<br><br>
+            <strong>UX note:</strong> Optional: one or two short quotes from members (real, not generic). Keep them unpolished — that's the signal.
+          </div>
+          <span class="wf-expand-hint">↓ expand</span>
+        </div>
+        <!-- Block 4 -->
+        <div class="wf-block wf-block-mid" onclick="this.classList.toggle('open')">
+          <div class="wf-block-top">
+            <div class="wf-block-meta">
+              <p class="wf-pos">Section 04 · Mid page</p>
+              <h3 class="wf-name">About Jorn</h3>
+              <p class="wf-headline">"I moved here not knowing anyone."</p>
+            </div>
+            <span class="wf-cta-chip">Follow along</span>
+          </div>
+          <div class="wf-detail">
+            <strong>Conversion role:</strong> Humanise the organiser. The club has a face — and that face is the reason people trust it.<br><br>
+            <strong>Subheading:</strong> Started with two people. Built for everyone who shows up.<br><br>
+            <strong>Body instruction:</strong> Use the origin story. Be brief. End on the shift — the moment someone who hated running became the person organising the group chat.<br><br>
+            <strong>UX note:</strong> One portrait — candid, not posed. Film-style if possible. This is not a professional headshot section.
+          </div>
+          <span class="wf-expand-hint">↓ expand</span>
+        </div>
+        <!-- Block 5 -->
+        <div class="wf-block wf-block-footer" onclick="this.classList.toggle('open')">
+          <div class="wf-block-top">
+            <div class="wf-block-meta">
+              <p class="wf-pos">Section 05 · Footer</p>
+              <h3 class="wf-name">Find us</h3>
+              <p class="wf-headline">"Show up. The rest follows."</p>
+            </div>
+            <span class="wf-cta-chip">Instagram →</span>
+          </div>
+          <div class="wf-detail">
+            <strong>Conversion role:</strong> Final prompt. Remove all remaining friction. The action is showing up — make it feel easy to start.<br><br>
+            <strong>Subheading:</strong> Next run: [day] · [time] · [location]<br><br>
+            <strong>Body instruction:</strong> Practical info only. Day, time, meeting point. One line. Then the Instagram link. That's where everything lives.<br><br>
+            <strong>UX note:</strong> Minimal. Dark footer, light text, accent link colour. Close with the tagline — the same one from the hero. Make it feel like a circle.
+          </div>
+          <span class="wf-expand-hint">↓ expand</span>
         </div>
       </div>
-      <div class="swatch">
-        <div class="swatch-color" style="background:#C4935A;"></div>
-        <div class="swatch-info">
-          <span class="swatch-name">Zacht amber</span>
-          <span class="swatch-hex">#C4935A</span>
-          <span class="swatch-role">Accent</span>
+    </section>
+
+    <!-- MODULE 7 -->
+    <section id="m7" class="module-section">
+      <p class="module-label">Module 07</p>
+      <h2 class="module-title">How you summarise yourself</h2>
+      <div class="tagline-list">
+        <div class="tagline-item">
+          <span class="tagline-num">01</span>
+          <div class="tagline-body">
+            <p class="tagline-text">The city at 6am is worth it.</p>
+            <p class="tagline-why">Leads with the experience, not the club. Specific to Tokyo's pre-dawn energy — someone who knows will feel it immediately. Doesn't need to explain anything.</p>
+          </div>
+        </div>
+        <div class="tagline-item">
+          <span class="tagline-num">02</span>
+          <div class="tagline-body">
+            <p class="tagline-text">No pace. No pressure. Just the run.</p>
+            <p class="tagline-why">Directly positions against performance-first run clubs. The triple structure mirrors Four Tet's rhythm — moving but not rushing. Clean and declarative.</p>
+          </div>
+        </div>
+        <div class="tagline-item">
+          <span class="tagline-num">03</span>
+          <div class="tagline-body">
+            <p class="tagline-text">Built for the ones who just landed.</p>
+            <p class="tagline-why">Speaks directly to the human Jorn described — new to somewhere, figuring it out. Carries warmth without being soft. "Just landed" also works metaphorically for anyone starting over.</p>
+          </div>
+        </div>
+        <div class="tagline-item">
+          <span class="tagline-num">04</span>
+          <div class="tagline-body">
+            <p class="tagline-text">We end wherever the run ends.</p>
+            <p class="tagline-why">Jorn's own language from the intake. Already a tagline — it captures the anti-structure philosophy in one sentence. Works as a slogan, a caption, a philosophy statement.</p>
+          </div>
+        </div>
+        <div class="tagline-item aanbevolen">
+          <span class="tagline-num">05</span>
+          <div class="tagline-body">
+            <p class="tagline-text">Show up. That's it. Show up and the rest follows.</p>
+            <p class="tagline-why">Jorn's own words, written exactly as he wrote them. The repetition of "show up" is not a mistake — it's the whole philosophy, doubled down on. The pause after the first two words makes it land.</p>
+          </div>
+          <span class="tagline-badge">Recommended</span>
         </div>
       </div>
-    </div>
-
-    <div class="font-display">
-      <div class="font-card">
-        <div class="font-sample-display">Cormorant<br>Garamond</div>
-        <p class="font-meta">Koppen — ernst en warmte</p>
-        <p class="card-body" style="margin-top:10px;font-size:13px;">Voor de ernst en warmte van vroeg-ochtend stilte. Brengt het gevoel van een doorleefd ritueel.</p>
+      <div class="aanbeveling-card">
+        <p class="aanbeveling-label">S4J4 Recommendation</p>
+        <p class="aanbeveling-text">Option 5 is the starting point. It's Jorn's own sentence — and it already knows what it is. The rhythm is correct, the repetition is intentional, and it contains the entire philosophy without explaining it. Any edit would make it worse. Use it on the hero, the footer, the bio, the Instagram. Let it be the throughline.</p>
       </div>
-      <div class="font-card">
-        <div class="font-sample-body">DM Sans<br>voor leestekst</div>
-        <p class="font-meta">Body — helder en menselijk</p>
-        <p class="card-body" style="margin-top:10px;font-size:13px;">Houdt het menselijk en leesbaar zonder tech-gevoel. Samen als een notitieboek van iemand die veel nagedacht heeft.</p>
-      </div>
-    </div>
+    </section>
 
-    <div class="section-label" style="margin-top:32px;">Sfeerwoorden</div>
-    <div class="sfeer-grid">
-      <span class="sfeer-tag sfeer-do">Doorleefd</span>
-      <span class="sfeer-tag sfeer-do">Aardend</span>
-      <span class="sfeer-tag sfeer-do">Uitnodigend</span>
-      <span class="sfeer-tag sfeer-dont">High-performance</span>
-      <span class="sfeer-tag sfeer-dont">Motiverend</span>
-      <span class="sfeer-tag sfeer-dont">Transformatief</span>
-    </div>
-  </div>
-
-  <!-- MODULE 5: VERBALE TOON -->
-  <div class="module" id="mod-toon">
-    <div class="section-label">Module 05 — Verbale Toon</div>
-    <h2>Hoe je schrijft.<br>Hoe je klinkt.</h2>
-
-    <div class="toon-card">
-      <div class="toon-rule">Schrijf over gevoel, niet over resultaat</div>
-      <div class="toon-examples">
-        <div class="toon-ex toon-ex-wel">
-          <p class="toon-ex-label">Wel</p>
-          <p>Hoe voelde de eerste kilometer voor je?</p>
+    <!-- NEXT STEP -->
+    <section id="next" class="module-section next-step-section">
+      <p class="module-label">Next step</p>
+      <h2 class="module-title">What do you do with this?</h2>
+      <div class="next-step-grid">
+        <div class="next-card self">
+          <p class="next-card-label">I'll take it from here</p>
+          <p class="next-card-body">Your Resonance.OS is your brief. Use the Website Blueprint to rewrite your own site, or hand it to a designer — without spending an hour explaining who you are.</p>
         </div>
-        <div class="toon-ex toon-ex-niet">
-          <p class="toon-ex-label">Niet</p>
-          <p>Verbeter je 5K-tijd in 8 weken.</p>
+        <div class="next-card build">
+          <p class="next-card-label">Build it with S4J4</p>
+          <p class="next-card-body">Your Resonance.OS is the foundation. S4J4 builds directly on it — no extra intake, no guesswork. The €247 is credited toward the project.</p>
+          <a href="https://s4j4.com/resonance-built" class="next-card-cta" target="_blank">Turn this into a website →</a>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="toon-card">
-      <div class="toon-rule">Gebruik concrete details — tijden, plaatsen, mensen</div>
-      <div class="toon-examples">
-        <div class="toon-ex toon-ex-wel">
-          <p class="toon-ex-label">Wel</p>
-          <p>Elke zondag om 7 uur in Yoyogi Park, daarna samen ontbijt.</p>
-        </div>
-        <div class="toon-ex toon-ex-niet">
-          <p class="toon-ex-label">Niet</p>
-          <p>Wij creëren een hechte gemeenschap rondom beweging en verbinding.</p>
-        </div>
-      </div>
-    </div>
+  </div><!-- /modules-wrapper -->
 
-    <div class="toon-card">
-      <div class="toon-rule">Spreek de twijfelaar aan, niet de overtuigde</div>
-      <div class="toon-examples">
-        <div class="toon-ex toon-ex-wel">
-          <p class="toon-ex-label">Wel</p>
-          <p>Als je altijd dacht dat hardlopen niet voor jou is — dat klopt misschien. Maar kom één keer.</p>
-        </div>
-        <div class="toon-ex toon-ex-niet">
-          <p class="toon-ex-label">Niet</p>
-          <p>Voor iedereen die van hardlopen houdt!</p>
-        </div>
-      </div>
-    </div>
-  </div>
+  <footer class="vault-footer">
+    <p><span>Signal Architecture · By S4J4</span> · May 2026</p>
+  </footer>
 
-  <!-- MODULE 6: WEBSITE BLUEPRINT -->
-  <div class="module" id="mod-blueprint">
-    <div class="section-label">Module 06 — Website Blueprint</div>
-    <h2>Vier secties.<br>Klaar om te bouwen.</h2>
-    <p class="body-text" style="margin-bottom:32px;">Primair doel: community laten groeien. Alle copy is klaar voor directe import in Framer.</p>
-
-    <div class="blueprint-section">
-      <div class="bp-head" onclick="toggleBP(this)">
-        <div><div class="bp-name">Hero</div><div class="bp-doel">Herkenning in de eerste vijf seconden</div></div>
-        <span class="bp-toggle">›</span>
-      </div>
-      <div class="bp-body">
-        <div class="bp-field"><div class="bp-field-label">Headline</div><div class="bp-field-value headline">Jouw lichaam is geen project.</div></div>
-        <div class="bp-field"><div class="bp-field-label">Subkop</div><div class="bp-field-value">Een hardloopclub in Tokyo voor mensen die willen bewegen zonder te presteren.</div></div>
-        <div class="bp-field"><div class="bp-field-label">CTA</div><span class="bp-cta">Kom één keer mee</span></div>
-      </div>
-    </div>
-
-    <div class="blueprint-section">
-      <div class="bp-head" onclick="toggleBP(this)">
-        <div><div class="bp-name">Over de club</div><div class="bp-doel">Wat dit anders maakt</div></div>
-        <span class="bp-toggle">›</span>
-      </div>
-      <div class="bp-body">
-        <div class="bp-field"><div class="bp-field-label">Headline</div><div class="bp-field-value headline">We praten nooit over pace.</div></div>
-        <div class="bp-field"><div class="bp-field-label">Subkop</div><div class="bp-field-value">Elke zondag 7 uur, Yoyogi Park. Daarna ontbijt.</div></div>
-        <div class="bp-field"><div class="bp-field-label">Body</div><div class="bp-field-value">We zijn begonnen met zes mensen. Nu zijn we met veertig. Niemand heeft geadverteerd. Mensen namen mensen mee. De enige vraag die we na een run stellen: hoe voelde het?</div></div>
-        <div class="bp-field"><div class="bp-field-label">CTA</div><span class="bp-cta">Lees hoe het werkt</span></div>
-      </div>
-    </div>
-
-    <div class="blueprint-section">
-      <div class="bp-head" onclick="toggleBP(this)">
-        <div><div class="bp-name">Voor wie</div><div class="bp-doel">De juiste mensen herkennen</div></div>
-        <span class="bp-toggle">›</span>
-      </div>
-      <div class="bp-body">
-        <div class="bp-field"><div class="bp-field-label">Headline</div><div class="bp-field-value headline">Niet voor de snellen.</div></div>
-        <div class="bp-field"><div class="bp-field-label">Subkop</div><div class="bp-field-value">Wel voor wie zijn lichaam wil bewonen in plaats van verbeteren.</div></div>
-        <div class="bp-field"><div class="bp-field-label">Body</div><div class="bp-field-value">Als je hier bent omdat je denkt dat hardlopen iets is voor anderen — welkom. Achterin lopen is ook lopen. Een maandag zonder hoofdpijn is een goed begin.</div></div>
-        <div class="bp-field"><div class="bp-field-label">CTA</div><span class="bp-cta">Kom kennismaken</span></div>
-      </div>
-    </div>
-
-    <div class="blueprint-section">
-      <div class="bp-head" onclick="toggleBP(this)">
-        <div><div class="bp-name">Aanmelden</div><div class="bp-doel">Lage drempel eerste contact</div></div>
-        <span class="bp-toggle">›</span>
-      </div>
-      <div class="bp-body">
-        <div class="bp-field"><div class="bp-field-label">Headline</div><div class="bp-field-value headline">Kom één keer mee.</div></div>
-        <div class="bp-field"><div class="bp-field-label">Subkop</div><div class="bp-field-value">Geen inschrijving, geen verplichtingen. Gewoon komen.</div></div>
-        <div class="bp-field"><div class="bp-field-label">CTA</div><span class="bp-cta">Stuur me een bericht</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODULE 7: TAGLINES -->
-  <div class="module" id="mod-tagline">
-    <div class="section-label">Module 07 — Tagline Lab</div>
-    <h2>Vijf manieren om te zeggen<br>wie je bent.</h2>
-
-    <div class="tagline-grid">
-      <div class="tagline-item recommended">
-        <div style="flex:1">
-          <div class="tagline-text">Jouw lichaam is geen project.</div>
-          <div class="tagline-why">Jorn's eigen woorden, letterlijk — radicaal eerlijk en onderscheidend van elke fitnessclub. Filtert én nodigt uit in vier woorden.</div>
-        </div>
-        <span class="tagline-badge">Aanbevolen</span>
-      </div>
-      <div class="tagline-item">
-        <div style="flex:1">
-          <div class="tagline-text">Een plek om te wonen in je lichaam.</div>
-          <div class="tagline-why">Vertaalt zijn kernovertuiging naar een uitnodiging zonder prestatie-taal.</div>
-        </div>
-      </div>
-      <div class="tagline-item">
-        <div style="flex:1">
-          <div class="tagline-text">We praten nooit over pace.</div>
-          <div class="tagline-why">Concreet en memorabel — iedereen begrijpt direct wat dit uitsluit én uitnodigt.</div>
-        </div>
-      </div>
-      <div class="tagline-item">
-        <div style="flex:1">
-          <div class="tagline-text">Bewegen zonder te verdienen.</div>
-          <div class="tagline-why">Raakt het diepe inzicht dat beweging geen beloning hoeft te zijn.</div>
-        </div>
-      </div>
-      <div class="tagline-item">
-        <div style="flex:1">
-          <div class="tagline-text">Veertig mensen. Nul advertenties.</div>
-          <div class="tagline-why">Bewijst de kwaliteit via het bewijs zelf — social proof als tagline.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="gap-card">
-      <h3 class="gap-title">Je hebt je Blueprint.</h3>
-      <p class="gap-text">Je identiteit staat. Je weet wie je bent, voor wie je het doet, en hoe je klinkt. De vraag is nu: bouw je de site zelf, of wil je dat het resultaat écht de energie van deze Blueprint evenaart?</p>
-      <a class="gap-btn" href="#">Boek de Signal Sprint — €697</a>
-    </div>
-  </div>
-
-</main>
-
-<footer class="footer">
-  <span class="footer-brand"><span>S4J4</span> · Signal Architecture</span>
-  <span class="footer-brand">Brand OS v1.0 · Jorn · 2025</span>
-</footer>
+</div><!-- /vault -->
 
 <script>
-function showModule(id, el) {
-  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('mod-' + id).classList.add('active');
-  el.classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+(function() {
+  const ACCESS_CODE = '481337';
+  const MASTER_CODE = '996600';
 
-function toggleBP(head) {
-  const body = head.nextElementSibling;
-  const isOpen = head.classList.contains('open');
-  document.querySelectorAll('.bp-head').forEach(h => {
-    h.classList.remove('open');
-    h.nextElementSibling.classList.remove('open');
-  });
-  if (!isOpen) {
-    head.classList.add('open');
-    body.classList.add('open');
+  const inputs = document.querySelectorAll('.pin-digit');
+  const errorEl = document.getElementById('pin-error');
+
+  // Defined early so auto-unlock param block can call it
+  function checkCode() {
+    const entered = Array.from(inputs).map(function(i) { return i.value; }).join('');
+    if (entered.length < 6) return;
+    if (entered === ACCESS_CODE || entered === MASTER_CODE) {
+      unlock();
+    } else if (entered.length === 6) {
+      errorEl.textContent = 'Incorrect code. Please try again.';
+      inputs.forEach(function(i) { i.value = ''; });
+      inputs[0].focus();
+      setTimeout(function() { errorEl.textContent = '\u00a0'; }, 3000);
+    }
   }
-}
+
+  // Auto-unlock from URL query param ?code=XXXXXX
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramCode = urlParams.get('code');
+  if (paramCode && paramCode.length === 6) {
+    paramCode.split('').forEach(function(ch, i) {
+      if (inputs[i]) inputs[i].value = ch;
+    });
+    checkCode();
+  }
+
+  inputs.forEach(function(input, i) {
+    input.addEventListener('input', function(e) {
+      const val = e.target.value.replace(/\D/g, '');
+      e.target.value = val;
+      if (val && i < inputs.length - 1) {
+        inputs[i + 1].focus();
+      }
+      checkCode();
+    });
+
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !input.value && i > 0) {
+        inputs[i - 1].focus();
+        inputs[i - 1].value = '';
+      }
+    });
+
+    input.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      if (pasted.length === 6) {
+        pasted.split('').forEach(function(ch, j) {
+          if (inputs[j]) inputs[j].value = ch;
+        });
+        inputs[5].focus();
+        checkCode();
+      }
+    });
+  });
+
+  function unlock() {
+    const lockScreen = document.getElementById('lock-screen');
+    const vault = document.getElementById('vault');
+    lockScreen.classList.add('unlocking');
+    setTimeout(function() {
+      lockScreen.style.display = 'none';
+      vault.classList.add('visible');
+      initVault();
+    }, 500);
+  }
+
+  function initVault() {
+    const sections = document.querySelectorAll('.module-section');
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    }, { threshold: 0.08 });
+
+    sections.forEach(function(s) { observer.observe(s); });
+
+    const navItems = document.querySelectorAll('.nav-item');
+    const nav = document.querySelector('.module-nav');
+
+    function setActiveNav(id) {
+      navItems.forEach(function(item) {
+        const isActive = item.getAttribute('href') === '#' + id;
+        item.classList.toggle('active', isActive);
+        if (isActive) {
+          const itemLeft = item.offsetLeft;
+          const itemWidth = item.offsetWidth;
+          const navWidth = nav.offsetWidth;
+          nav.scrollTo({
+            left: itemLeft - (navWidth / 2) + (itemWidth / 2),
+            behavior: 'smooth'
+          });
+        }
+      });
+    }
+
+    const navObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          setActiveNav(entry.target.id);
+        }
+      });
+    }, { rootMargin: '-96px 0px -50% 0px' });
+
+    sections.forEach(function(s) { navObserver.observe(s); });
+
+    if (sections.length > 0) setActiveNav(sections[0].id);
+
+    inputs[0].blur();
+  }
+
+  setTimeout(function() { inputs[0].focus(); }, 300);
+})();
 </script>
 </body>
 </html>
